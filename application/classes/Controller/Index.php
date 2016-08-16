@@ -1,27 +1,56 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 class Controller_Index extends Controller_Template {
-
+	
 	public $template = 'TemplateIndex';
 	
+	private $session;
+
+	public function before()
+	{
+		parent::before();
+		Session::$default = 'database';
+		$this->session = Session::instance();		
+
+		//si no esta logueado
+		if($this->is_logged_in()!=true)
+		{			
+			//indicamos la vista del login			
+			$this->template = View::factory('Login');			
+		}	
+	}	
+
+	//funcion para obtener la variable de login
+	private function is_logged_in()
+	{	
+		//obtenemos la variable de session 
+		return $this->session->get('logged_in');
+	}
+		
 	public function action_index()
 	{
-		//obtenemos todas las filas de la tabla
-		$recursos = ORM::factory('recurso')->find_all();
-
-		//si existen datos
-		if(isset($recursos[0]))
+		if($this->is_logged_in()==true)
 		{
-			//agregamos al template o a lavista la tabla recursos
-			$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
-		}		
-		else
-		{	
-			//agregamos al template una tabla vacia
-			$recursos = array();
-			$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
-		}
+			$usuario = $this->session->get('username');
 
+			//obtenemos todas las filas de la tabla
+			$recursos = ORM::factory('recurso')->find_all();
+
+			//si existen datos
+			if(isset($recursos[0]))
+			{
+				$this->template->usuario = $usuario;
+				//agregamos al template o a lavista la tabla recursos
+				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
+			}		
+			else
+			{	
+				//agregamos al template una tabla vacia
+				$this->template->usuario = $usuario;
+				$recursos = array();
+				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
+			}
+		}
 	}
 
 	public function action_formulario(){
@@ -31,6 +60,10 @@ class Controller_Index extends Controller_Template {
 		//obtenemos el recurso segun el id, en caso de agreegar un nuevo no obtenemos datos
 		$recurso = ORM::factory('recurso',$id);
 
+		$usuario = $this->session->get('username');
+
+		$this->template->usuario = $usuario;
+		
 		//agregar a la vista el recurso en caso lo hemos obtenido
 		$this->template->content = View::factory('Index/Editar')->bind('recurso',$recurso);
 	}

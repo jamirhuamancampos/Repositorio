@@ -104,6 +104,7 @@ if (isset($_SERVER['KOHANA_ENV']))
  */
 Kohana::init(array(
 	'base_url'   => 'http://localhost/kohana-v3.3.5/',
+	'index_file'=>  FALSE,
 ));
 
 /**
@@ -139,7 +140,7 @@ Kohana::modules(array(
  * uncomment the line below and define a preferrably long salt.
  */
  //Cookie::$salt = NULL;
-
+ Cookie::$salt = md5('secret');
 /**
  * Set the routes. Each route must have a minimum of a name, a URI and a set of
  * defaults for the URI.
