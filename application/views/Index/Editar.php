@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.'); ?>
 
-<?=Form::open('Index/registrar')?>
+<?=Form::open('Index/actualizar')?>
 <table>
 	
 	<tr>
@@ -60,11 +60,22 @@
 
 		<td>
 			<select name="codigo_editorial">
-				<option value="1">Thompson</option>
-				<option value="2">Larrouse</option>
-				<option value="3">Astral</option>
-				<option value="4">Amsda</option>
-				<option value="5">sad</option>
+				<?php foreach($editoriales as $editorial) { 
+					if($recurso->codigo_editorial == $editorial->codigo){
+						?>
+									
+						<option value="<?php echo $editorial->codigo; ?>" selected>
+							<?php echo $editorial->nombre; ?>
+						</option>
+					<?php 
+						}
+						else { ?>
+						<option value="<?php echo $editorial->codigo; ?>">
+							<?php echo $editorial->nombre; ?>
+						</option>	
+						<?php }
+					}
+				?>
 			</select>
 		</td>
 	</tr>

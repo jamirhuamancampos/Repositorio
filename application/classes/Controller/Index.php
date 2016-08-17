@@ -35,40 +35,73 @@ class Controller_Index extends Controller_Template {
 
 			//obtenemos todas las filas de la tabla
 			$recursos = ORM::factory('recurso')->find_all();
+			$editoriales = ORM::factory('editorial')->find_all();
 
 			//si existen datos
 			if(isset($recursos[0]))
 			{
 				$this->template->usuario = $usuario;
 				//agregamos al template o a lavista la tabla recursos
-				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
+				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos)->bind('editoriales',$editoriales);
 			}		
 			else
 			{	
 				//agregamos al template una tabla vacia
 				$this->template->usuario = $usuario;
 				$recursos = array();
-				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos);
+				$this->template->content = View::factory('Index/Recurso')->bind('recursos',$recursos)->bind('editoriales',$editoriales);
 			}
 		}
 	}
 
-	public function action_formulario(){
+	public function action_agregar(){
 		//obtenemos el id si esta editando. si esta agregando uno nuevo estara vacio
 		$id = $this->request->param('id');
 
 		//obtenemos el recurso segun el id, en caso de agreegar un nuevo no obtenemos datos
 		$recurso = ORM::factory('recurso',$id);
 
+		$editoriales = ORM::factory('editorial')->find_all();
+
 		$usuario = $this->session->get('username');
 
 		$this->template->usuario = $usuario;
 		
 		//agregar a la vista el recurso en caso lo hemos obtenido
-		$this->template->content = View::factory('Index/Editar')->bind('recurso',$recurso);
+		$this->template->content = View::factory('Index/Agregar')->bind('editoriales',$editoriales);
 	}
 
 	public function action_registrar(){
+		$recurso = ORM::factory('recurso');
+
+		//obtener todos los datos
+		$recurso->values($_POST);
+
+		//guardar
+		$recurso->save();		
+
+		//redireccionar a la pagina principal
+		HTTP::redirect('Index');		
+	}
+
+	public function action_editar(){
+		//obtenemos el id si esta editando. si esta agregando uno nuevo estara vacio
+		$id = $this->request->param('id');
+
+		//obtenemos el recurso segun el id, en caso de agreegar un nuevo no obtenemos datos
+		$recurso = ORM::factory('recurso',$id);
+
+		$editoriales = ORM::factory('editorial')->find_all();
+
+		$usuario = $this->session->get('username');
+
+		$this->template->usuario = $usuario;
+		
+		//agregar a la vista el recurso en caso lo hemos obtenido
+		$this->template->content = View::factory('Index/Editar')->bind('recurso',$recurso)->bind('editoriales',$editoriales);
+	}
+	
+	public function action_actualizar(){
 		$recurso = ORM::factory('recurso',$_POST['id']);
 
 		unset($_POST['id']);
@@ -80,7 +113,7 @@ class Controller_Index extends Controller_Template {
 		$recurso->save();		
 
 		//redireccionar a la pagina principal
-		HTTP::redirect('Index');
+		HTTP::redirect('Index');		
 	}
 
 	public function action_eliminar(){
